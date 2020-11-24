@@ -1,40 +1,74 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
+    
+    <form @submit.prevent="addNewTodo">
+      <label>New Todo</label>
+      <input name="newtodo" v-model="newTodo">
+      <button> Add </button>
+    </form>
+    
+    <button @click="removeAll()">Remove All Todos</button>
+    <button @click="markAllDone()">Mark All Done</button>
+
     <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
+      <li v-for="(todo, index) in todos" :key="todo.id">
+        <h3 :class="{ done: todo.done }" @click="toggleDone(todo)"> {{ todo.content }} </h3>
+        <button @click="removeTodo(index)"> Remove </button>
+      </li>
     </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+
   </div>
 </template>
 
 <script>
+
+import { ref } from 'vue';
+
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  setup() {
+    const newTodo = ref('');
+    const todos = ref([]);
+
+    function addNewTodo() {
+      todos.value.push({
+        id: Date.now(),
+        done: false,
+        content: newTodo.value
+      });
+
+      newTodo.value = "";
+    }
+
+    function toggleDone(todo) {
+      todo.done = !todo.done; 
+    }
+
+    function removeTodo(index) {
+      todos.value.splice(index, 1);
+    }
+
+    function markAllDone() {
+      todos.value.forEach(todo => todo.done = true);
+    }
+
+    function removeAll() {
+      todos.value = [];
+    }
+
+    return {
+      newTodo,
+      todos,
+      addNewTodo,
+      toggleDone,
+      removeTodo,
+      markAllDone,
+      removeAll
+    }
   }
 }
 </script>
@@ -51,8 +85,13 @@ ul {
 li {
   display: inline-block;
   margin: 0 10px;
+  cursor:  pointer;
 }
 a {
   color: #42b983;
+}
+
+.done {
+  text-decoration: line-through;
 }
 </style>
